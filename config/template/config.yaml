@@ -1,0 +1,15 @@
+node:
+  cluster: local
+  id: envoy
+
+dynamic_resources:
+  cds_config:
+    path: "{{ .Clusters }}"
+  lds_config:
+    path: "{{ .Listeners }}"
+
+admin:
+  address:
+    socket_address:
+      address: 127.0.0.1
+      port_value: 0
