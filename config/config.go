@@ -81,8 +81,11 @@ func (c *Config) Watch(ctx context.Context) error {
 		cancel()
 		os.Exit(1)
 	}
+
 	<-cancelCtx.Done()
+
 	if runtime.GOOS == "darwin" {
+		syscall.Kill(cmd.Process.Pid+1, syscall.SIGINT)
 		syscall.Kill(cmd.Process.Pid+1, syscall.SIGKILL)
 	}
 	return nil
