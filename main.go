@@ -68,11 +68,17 @@ func proxyVersion(dir string) string {
 	captured := string(b)
 	parts := strings.Split(captured, ".")
 	if len(parts) == 3 {
+		// Check if the binary is there. TODO(dio): Make sure we accommodate windows as well.
+		_, err = os.Lstat(filepath.Join(dir, "versions", captured, "bin", "envoy"))
+		if err != nil {
+			return ""
+		}
 		return captured
 	}
 	for i := 0; i < 20; i++ {
 		version := fmt.Sprintf(captured+".%d", i)
-		_, err = os.Lstat(filepath.Join(dir, "versions", version))
+		// Check if the binary is there. TODO(dio): Make sure we accommodate windows as well.
+		_, err = os.Lstat(filepath.Join(dir, "versions", version, "bin", "envoy"))
 		if err == nil {
 			return version
 		}
