@@ -175,6 +175,11 @@ func buildConfig(dir, configFile string) (ConfigFiles, error) {
 		return ConfigFiles{}, err
 	}
 
+	err = bootstrap.ValidateAll()
+	if err != nil {
+		return ConfigFiles{}, err
+	}
+
 	data := ConfigFiles{
 		Clusters:         filepath.Join(dir, "clusters.json"),
 		Listeners:        filepath.Join(dir, "listeners.json"),
