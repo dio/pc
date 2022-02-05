@@ -6,7 +6,7 @@ to manage multiple versions of proxies.
 
 ## Install
 
-```
+```console
 go install github.com/dio/pc@main
 ```
 

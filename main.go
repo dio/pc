@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -75,7 +76,8 @@ func proxyVersion(dir string) string {
 		}
 		return captured
 	}
-	for i := 0; i < 20; i++ {
+	dirs, _ := ioutil.ReadDir(filepath.Join(dir, "versions"))
+	for i := len(dirs); i >= 0; i-- {
 		version := fmt.Sprintf(captured+".%d", i)
 		// Check if the binary is there. TODO(dio): Make sure we accommodate windows as well.
 		_, err = os.Lstat(filepath.Join(dir, "versions", version, "bin", "envoy"))
