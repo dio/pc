@@ -20,7 +20,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"os/signal"
 	"syscall"
 )
 
@@ -36,10 +35,16 @@ func (r *Runner) Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to start %s: %w", r.binary, err)
 	}
+
+	// Wait until done.
+	<-r.ctx.Done()
+
 	if err = r.cmd.Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			waitStatus, _ := exitError.Sys().(syscall.WaitStatus)
-			fmt.Printf("wait status is captured: %d\n", waitStatus)
+			if waitStatus.Signaled() {
+				fmt.Println("process was signalled to shutdown")
+			}
 			return nil
 		}
 		return fmt.Errorf("failed to launch %s: %v", r.binary, err)
@@ -49,7 +54,7 @@ func (r *Runner) Run() error {
 
 // New returns initialized command.
 func New(ctx context.Context, binary string, args []string, out io.Writer) (*Runner, func(error)) {
-	cmd := exec.Command(binary, args...) //nolint:gosec
+	cmd := exec.CommandContext(ctx, binary, args...) //nolint:gosec
 	cmd.Stdin = os.Stdin
 	if out == nil {
 		cmd.Stdout = os.Stdout
@@ -60,12 +65,11 @@ func New(ctx context.Context, binary string, args []string, out io.Writer) (*Run
 		cmd.Stderr = out
 	}
 
-	sCtx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	return &Runner{
-			ctx:    sCtx,
+			ctx:    ctx,
 			cmd:    cmd,
 			binary: binary,
 		}, func(error) {
-			cancel()
+			_ = cmd.Wait() // to make sure we are done.
 		}
 }
