@@ -168,6 +168,7 @@ func buildConfig(dir, configFile string) (ConfigFiles, error) {
 	if err != nil {
 		return ConfigFiles{}, err
 	}
+	fmt.Println(string(j))
 
 	var bootstrap bootstrapv3.Bootstrap
 	err = protojson.Unmarshal(j, &bootstrap)
@@ -185,6 +186,15 @@ func buildConfig(dir, configFile string) (ConfigFiles, error) {
 		Listeners:        filepath.Join(dir, "listeners.json"),
 		Config:           filepath.Join(dir, "config.yaml"),
 		AdminAddressPath: filepath.Join(dir, "admin.txt"),
+	}
+
+	if bootstrap.DynamicResources != nil {
+		// When we have dynamic resources, we keep it AS IS.
+		err = os.WriteFile(data.Config, content, os.ModePerm)
+		if err != nil {
+			return ConfigFiles{}, err
+		}
+		return data, nil
 	}
 
 	err = writeDynamicConfig(data.Clusters, clustersToMessages(bootstrap.StaticResources.Clusters))

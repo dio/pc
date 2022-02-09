@@ -15,17 +15,17 @@ go install github.com/dio/pc@main
 If you have [Go 1.17.x](https://go.dev/doc/install) installed on your system:
 
 ```console
-go run github.com/dio/pc@main -c internal/handler/testdata/config.yaml
+go run github.com/dio/pc@main -c internal/handler/testdata/static-only.yaml
 ```
 
 When you have this repo downloaded:
 
 ```console
-go run main.go -c internal/handler/testdata/config.yaml
+go run main.go -c internal/handler/testdata/static-only.yaml
 ```
 
 While the following also works:
 
 ```console
-go run main.go func-e run -c internal/handler/testdata/config.yaml
+go run main.go func-e run -c internal/handler/testdata/static-only.yaml
 ```
