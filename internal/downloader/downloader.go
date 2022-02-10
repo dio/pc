@@ -32,12 +32,13 @@ import (
 
 // DownloadVersionedBinary returns the downloaded binary file path.
 func DownloadVersionedBinary(ctx context.Context, archive archives.Archive, destDir string) (string, error) {
-	err := os.MkdirAll(destDir, 0o750)
+	destinationDir := filepath.Join(destDir, archive.BinaryDir())
+	err := os.MkdirAll(destinationDir, 0o750)
 	if err != nil {
-		return "", fmt.Errorf("could not create directory %s: %v", destDir, err)
+		return "", fmt.Errorf("could not create directory %s: %v", destinationDir, err)
 	}
 
-	destinationPath := filepath.Join(destDir, archive.BinaryDir(), archive.BinaryName())
+	destinationPath := filepath.Join(destinationDir, archive.BinaryName())
 	if _, err := os.Stat(destinationPath); err != nil {
 		downloadURL := GetArchiveURL(archive)
 		// TODO(dio): Streaming the bytes from remote file. We decided to use this for skipping copying
